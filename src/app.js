@@ -1,31 +1,32 @@
 const express = require("express");
+const connectDb=require("./config/database");
 const app = express();
+const User=require("./models/user");
 
-app.get("/user",(req,res)=>{
-  res.send({
-    "name":"John",
-    "age":30
-  })
+app.post("/signup",async(req,res)=>{
+  const user=new User({
+    firstName:"virat",
+    lastName:"kohli",
+    emailId:"viratkohli@gmail.com",
+    password:"virat123"
+
+  });
+  try{
+  await user.save();
+  res.send("user added successfully");
+  } catch(err){
+    res.status(400).send(err);
+  }
 });
 
-app.post("/user",async(req,res)=>{
-  res.send("Data Successfully saved to the database")
-});
-
-app.delete("/user",(req,res)=>{
-  res.send("User deleted successfully");
-});
-
-// Specific routes first
-
-
-app.use("/test", (req, res) => {
-  res.send("Hello World we are testing server");
-});
-
-// General route last
+connectDb().then(()=>{
+  console.log("connected to db");
+  app.listen(3000, () => {
+    console.log("Server is running on port 3000");
+  });
+  }).catch((err)=>{
+    console.error(err);
+})
 
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
+
