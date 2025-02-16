@@ -41,14 +41,14 @@ const userSchema=new mongoose.Schema({
   gender:{
     type:String,
     validate(value){
-      if(!["male","female","others"].includes(value)){
+      if(!["Male","Female","Others"].includes(value)){
         throw new Error("Invalid gender");
       }
     }
   },
   photoUrl:{
     type:String,
-    default:"https://d2qp0siotla746.cloudfront.net/img/use-cases/profile-picture/template_0.jpg"
+    default:"https://secdatacom.no/wp-content/uploads/sites/3/2019/10/blank-profile-male.jpg"
   },
   about:{
     type:String,

@@ -87,6 +87,7 @@ console.log(users);
   }
 });
 */
+/*
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
@@ -123,7 +124,43 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "ERROR: " + err.message });
   }
+});*/
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
+
+    // Fetch connection requests
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [
+        { fromUserId: loggedInUser._id },
+        { toUserId: loggedInUser._id },
+      ],
+    }).select("fromUserId toUserId");
+
+    // Determine users to exclude from the feed
+    const hideUserFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUserFromFeed.add(req.fromUserId.toString());
+      hideUserFromFeed.add(req.toUserId.toString());
+    });
+
+    // Fetch users to show in the feed
+    const users = await User.find({
+      _id: { $nin: Array.from(hideUserFromFeed), $ne: loggedInUser._id }
+    }).select(USER_SAFE_DATA).skip(skip).limit(limit);
+
+    console.log("Users being sent to frontend:", users); // Debugging
+
+    res.json({ users }); // ✅ Ensure response contains users array
+  } catch (err) {
+    res.status(500).json({ message: "ERROR: " + err.message });
+  }
 });
+
 
 
 

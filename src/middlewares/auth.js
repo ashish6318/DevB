@@ -5,7 +5,10 @@ const User=require("../models/user");
   const userAuth=async(req,res,next)=>{
 try{
   const {token}=req.cookies;
-  if(!token) throw new Error("Token is not valid !!");
+  if(!token){
+    return res.status(401).json({error:"Please login to access this resource"});
+  };
+
   const decodedObj=await jwt.verify(token,"@Ashish0904");
   const {_id}=decodedObj;
 
