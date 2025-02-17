@@ -9,7 +9,7 @@ try{
     return res.status(401).json({error:"Please login to access this resource"});
   };
 
-  const decodedObj=await jwt.verify(token,"@Ashish0904");
+  const decodedObj=await jwt.verify(token,process.env.JWT_TOKEN_KEY);
   const {_id}=decodedObj;
 
   const user=await User.findById(_id);
